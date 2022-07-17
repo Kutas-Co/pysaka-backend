@@ -16,10 +16,11 @@ abstract class TestCase extends BaseTestCase
      * @param User|null $user
      * @return void
      */
-    protected function withAuthUser(User $user = null): void
+    protected function withAuthUser(User $user = null): User
     {
         $this->user = $user ?? User::factory()->create();
         $this->actingAs($this->user);
+        return $this->user;
     }
 
 }

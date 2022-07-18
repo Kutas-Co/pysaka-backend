@@ -1,4 +1,4 @@
-@servers(['dev' => ['esti_it']])
+@servers(['dev' => ['p_prod']])
 
 @task('deploy-dev', ['on' => 'dev'])
 cd /var/www/sandbox
@@ -9,3 +9,4 @@ php artisan migrate
 php artisan optimize:clear
 php artisan queue:restart
 php artisan up
+@endtask

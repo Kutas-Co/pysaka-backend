@@ -24,6 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
     });
 
     Route::resource('games', GameController::class)->only('create', 'update', 'show');
+    Route::get('user/games', [GameController::class, 'indexUser'])->name('games.user.index');
     Route::post('games/{game}/start', [GameController::class, 'start'])->name('games.start');
     Route::post('games/{game}/finish', [GameController::class, 'finish'])->name('games.finish');
 });

@@ -35,6 +35,21 @@ class GameControllerTest extends TestCase
     /**
      * @test
      */
+    public function user_can_get_own_games_list()
+    {
+        Game::factory()->count(3)->create(['user_id' => $this->user->id]);
+        Game::factory()->create();
+
+        $response = $this->getJson(route('games.user.index'));
+        $response
+            ->assertSuccessful()
+            ->assertJsonStructure(['data' =>[ '*' =>  GameResource::jsonSchema(['rounds'])]]);
+        $this->assertCount(3, $response->json('data'));
+    }
+
+    /**
+     * @test
+     */
     public function user_can_get_game_by_id()
     {
         $game = Game::factory()->create(['user_id' => $this->user->id]);

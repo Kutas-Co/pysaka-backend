@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('status')->default(Game::STATUS_DRAFT);
             $table->unsignedTinyInteger('rounds_max')->default(15);
             $table->timestamp('locked_at')->nullable();
-            $table->unsignedSmallInteger('max_lock_minutes')->nullable();
+            $table->unsignedSmallInteger('max_lock_minutes')->nullable()->default(15);
             $table->timestamps();
         });
     }

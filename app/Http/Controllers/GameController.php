@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateGameRequest;
 use App\Http\Resources\GameResource;
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GameController extends Controller
 {
@@ -28,6 +29,8 @@ class GameController extends Controller
     {
         return GameResource::make($request->user()->games()->firstOrCreate([
             'status' => Game::STATUS_DRAFT,
+            'rounds_max' => 5,
+            'max_lock_minutes' => 15,
         ]));
     }
 
@@ -46,11 +49,14 @@ class GameController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Game  $game
-     * @return \Illuminate\Http\Response
+     * @return GameResource
      */
-    public function show(Game $game)
+    public function show(Request $request,Game $game)
     {
-        //
+        $this->validate($request, [
+            'includes' => ['sometimes', 'array', Rule::in(['rounds'])]
+        ]);
+        return GameResource::make($game->load($request->input('includes', [] )));
     }
 
     /**

@@ -27,9 +27,8 @@ class UpdateGameRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', 'min:2'],
-            'status' => ['required', 'string', Rule::in([Game::STATUS_CREATED, ])],
             'rounds_max' => ['required', 'nullable', 'numeric', 'max:255', 'min:2'],
-            'max_lock_minutes' => ['required', 'numeric', 'max:10080', 'min:5'],
+            'max_lock_minutes' => ['nullable', 'numeric', 'present', 'max:10080'],
         ];
     }
 }

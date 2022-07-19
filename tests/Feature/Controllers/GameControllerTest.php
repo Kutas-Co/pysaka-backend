@@ -6,11 +6,12 @@ use App\Http\Resources\GameResource;
 use App\Models\Game;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GameControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     public User $user;
 
@@ -34,7 +35,19 @@ class GameControllerTest extends TestCase
     /**
      * @test
      */
-    public function user_can_create_game()
+    public function user_can_get_game_by_id()
+    {
+        $game = Game::factory()->create(['user_id' => $this->user->id]);
+
+        $this->getJson(route('games.show', ['game' => $game->id, 'includes' => ['rounds']]))
+            ->assertSuccessful()
+            ->assertJsonStructure(GameResource::jsonSchema());
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_update_game_settings()
     {
         $game = Game::factory()->create(['user_id' => $this->user->id]);
 
@@ -43,7 +56,6 @@ class GameControllerTest extends TestCase
         $newData = [
             'name' => 'Test name',
             'rounds_max' => 5,
-            'status' => Game::STATUS_CREATED,
             'max_lock_minutes' => 100,
         ];
 

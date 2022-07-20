@@ -31,5 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::apiResource('rounds', RoundController::class)->only(['update', 'show']);
     Route::get('games/{game}/rounds/create', [RoundController::class, 'create'])->name('rounds.create');
     Route::post('rounds/{round}/publish', [RoundController::class, 'publish'])->name('rounds.publish');
+    Route::get('games/{game}/rounds/next', [RoundController::class, 'nextRound'])->name('games.rounds.next');
 });
 

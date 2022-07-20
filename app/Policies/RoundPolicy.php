@@ -45,7 +45,21 @@ class RoundPolicy
         return $game->locked_at === null
             && (
                 $game->status == Game::STATUS_STARTED
-                || ( $game->status == Game::STATUS_WAITING_FIRST_ROUND && $game->user_id == $user->id )
+                || ( $game->status == Game::STATUS_DRAFT && $game->user_id == $user->id )
+            );
+    }
+
+    /**
+     * @param User $user
+     * @param Game $game
+     * @return bool
+     */
+    public function getNext(User $user, Game $game)
+    {
+        return $game->locked_at === null
+            && (
+                $game->status == Game::STATUS_STARTED
+                || ( $game->user_id == $user->id && in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]) )
             );
     }
 

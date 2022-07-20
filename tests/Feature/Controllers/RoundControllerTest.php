@@ -31,19 +31,54 @@ class RoundControllerTest extends TestCase
     /**
      * @test
      */
-    public function user_can_get_first_draft_round_for_own_game()
+    public function user_can_create_first_draft_round_for_own_game()
     {
-        $this->game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
+        $this->game->update(['status' => Game::STATUS_DRAFT]);
         $this->assertEquals(0, $this->game->rounds()->count());
+        $this->assertDatabaseHas('games', [
+            'id' => $this->game->id,
+            'status' => Game::STATUS_DRAFT,
+            'locked_at' => null,
+        ]);
+
+        $this->getJson(route('games.rounds.next', ['game' => $this->game]))
+            ->assertSuccessful()
+            ->assertJsonStructure(RoundResource::jsonSchema())
+            ->assertJsonPath('status', Round::STATUS_DRAFT );
+
         $this->assertDatabaseHas('games', [
             'id' => $this->game->id,
             'status' => Game::STATUS_WAITING_FIRST_ROUND,
             'locked_at' => null,
         ]);
 
-        $this->getJson(route('rounds.create', ['game' => $this->game]))
+        $this->assertEquals(1, $this->game->rounds()->count());
+
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_get_first_draft_round_for_own_game()
+    {
+        $this->game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
+        $round = Round::factory()->create([
+            'game_id' => $this->game->id,
+            'author_id' => $this->user->id,
+            'status' => Round::STATUS_DRAFT,
+        ]);
+        $this->assertEquals(1, $this->game->rounds()->count());
+
+        $this->assertDatabaseHas('games', [
+            'id' => $this->game->id,
+            'status' => Game::STATUS_WAITING_FIRST_ROUND,
+            'locked_at' => null,
+        ]);
+
+        $this->getJson(route('games.rounds.next', ['game' => $this->game]))
             ->assertSuccessful()
             ->assertJsonStructure(RoundResource::jsonSchema())
+            ->assertJsonPath('id', $round->id)
             ->assertJsonPath('status', Round::STATUS_DRAFT );
 
         $this->assertDatabaseHas('games', [

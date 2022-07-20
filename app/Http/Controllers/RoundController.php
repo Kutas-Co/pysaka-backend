@@ -21,6 +21,27 @@ class RoundController extends Controller
         //
     }
 
+    public function nextRound( Game $game)
+    {
+        $this->authorize('getNext', [Round::class, $game]);
+
+        if ( $game->status == Game::STATUS_STARTED ){
+            $game->lockGame();
+        }
+        if ( $game->status == Game::STATUS_DRAFT ){
+            $game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
+        }
+
+        return RoundResource::make(Round::query()->firstOrCreate([
+            'game_id' => $game->id,
+            'status' => Round::STATUS_DRAFT,
+            'author_id' => request()->user()->id,
+        ], [
+            'text' => '',
+            'excerpt' => '',
+            ]));
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -30,8 +51,11 @@ class RoundController extends Controller
     {
         $this->authorize('create', [Round::class, $game]);
 
-        if ($game->status != Game::STATUS_WAITING_FIRST_ROUND){
+        if ($game->status != Game::STATUS_DRAFT){
             $game->lockGame();
+        }
+        if ($game->status == Game::STATUS_DRAFT){
+            $game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
         }
 
         return RoundResource::make(Round::query()->firstOrCreate([

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\RoundController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,8 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('user/games', [GameController::class, 'indexUser'])->name('games.user.index');
     Route::post('games/{game}/start', [GameController::class, 'start'])->name('games.start');
     Route::post('games/{game}/finish', [GameController::class, 'finish'])->name('games.finish');
+    Route::apiResource('rounds', RoundController::class)->only(['update', 'show']);
+    Route::get('games/{game}/rounds/create', [RoundController::class, 'create'])->name('rounds.create');
+    Route::post('rounds/{round}/publish', [RoundController::class, 'publish'])->name('rounds.publish');
 });
 

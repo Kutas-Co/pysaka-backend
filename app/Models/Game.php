@@ -13,6 +13,7 @@ class Game extends Model
     const STATUS_DRAFT = 'Draft';
     const STATUS_CREATED = 'Created';
     const STATUS_STARTED = 'Started';
+    const STATUS_WAITING_FIRST_ROUND = 'Waiting first round';
     const STATUS_FINISHED = 'Finished';
 
     /**
@@ -42,4 +43,14 @@ class Game extends Model
     {
         $this->update(['status' => self::STATUS_FINISHED]);
     }
+
+    /**
+     * @return void
+     */
+    public function lockGame(): void
+    {
+        $this->locked_at = now();
+        $this->save();
+    }
+
 }

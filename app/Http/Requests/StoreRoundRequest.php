@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Game;
+use App\Models\Round;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRoundRequest extends FormRequest
@@ -13,7 +15,8 @@ class StoreRoundRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        $game = Game::findOrFail($this->input('game_id'));
+        return $this->user()->can('create', [Round::class, $game]);
     }
 
     /**
@@ -24,7 +27,9 @@ class StoreRoundRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'game_id' => ['required', 'numeric', 'exists:games,id'],
+            'text' => ['required', 'string', 'max:65000'],
+            'excerpt' => ['required', 'string', 'max:1000'],
         ];
     }
 }

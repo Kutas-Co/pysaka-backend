@@ -29,7 +29,8 @@ class GameControllerTest extends TestCase
     {
         $this->getJson(route('games.create'))
             ->assertSuccessful()
-            ->assertJsonStructure(GameResource::jsonSchema(['rounds']));
+            ->assertJsonStructure(GameResource::jsonSchema(['rounds']))
+            ->assertJsonPath('status', Game::STATUS_DRAFT);
     }
 
     /**
@@ -79,6 +80,8 @@ class GameControllerTest extends TestCase
             ->assertJsonStructure(GameResource::jsonSchema());
 
         $this->assertDatabaseHas('games', [ 'id' => $game->id ] + $newData );
+        $this->assertEquals(Game::STATUS_DRAFT, $game->fresh()->status);
+
     }
 
     /**

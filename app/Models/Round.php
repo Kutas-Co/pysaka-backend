@@ -10,6 +10,9 @@ class Round extends Model
 {
     use HasFactory;
 
+    const STATUS_DRAFT = 'Draft';
+    const STATUS_PUBLISHED = 'Published';
+
     /**
      * @var string[]
      */
@@ -19,8 +22,16 @@ class Round extends Model
         'prev_round_id',
         'text',
         'excerpt',
+        'status',
     ];
 
+    /**
+     * @return void
+     */
+    public function publish()
+    {
+        $this->update(['status' => Round::STATUS_PUBLISHED]);
+    }
     /**
      * @return BelongsTo
      */

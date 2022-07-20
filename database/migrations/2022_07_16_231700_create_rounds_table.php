@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('text');
             $table->string('excerpt', 1000);
             $table->foreignIdFor(Round::class,'prev_round_id')->nullable();
+            $table->string('status', 50)->default(Round::STATUS_DRAFT);
             $table->timestamps();
         });
     }

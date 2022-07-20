@@ -2,10 +2,23 @@
 
 namespace App\Http\Resources;
 
+use App\Traits\WithResourceSchema;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoundResource extends JsonResource
 {
+    use WithResourceSchema;
+
+    const JSON_SCHEMA = [
+        'id',
+        'author_id',
+        'game_id',
+        'text',
+        'excerpt',
+        'prev_round_id',
+        'status',
+    ];
+
     /**
      * Transform the resource into an array.
      *
@@ -14,6 +27,14 @@ class RoundResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'author_id' => $this->author_id,
+            'game_id' => $this->game_id,
+            'text' => $this->text,
+            'excerpt' => $this->excerpt,
+            'prev_round_id' => $this->prev_round_id,
+            'status' => $this->status,
+        ];
     }
 }

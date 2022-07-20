@@ -13,7 +13,7 @@ class UpdateRoundRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return $this->user()->can('update', $this->route('round'));
     }
 
     /**
@@ -24,7 +24,8 @@ class UpdateRoundRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'text' => ['required', 'string', 'max:65000'],
+            'excerpt' => ['required', 'string', 'max:1000'],
         ];
     }
 }

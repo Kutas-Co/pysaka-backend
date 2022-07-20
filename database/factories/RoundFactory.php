@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Game;
+use App\Models\Round;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,6 +25,7 @@ class RoundFactory extends Factory
             'prev_round_id' => null,
             'text' => $this->faker->text,
             'excerpt' => $this->faker->sentence,
+            'status' => Round::STATUS_DRAFT,
         ];
     }
 }

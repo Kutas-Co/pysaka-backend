@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Game;
 use App\Models\Round;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -30,7 +31,7 @@ class RoundPolicy
      */
     public function view(User $user, Round $round)
     {
-        //
+        return $user->id == $round->author_id;
     }
 
     /**
@@ -39,9 +40,13 @@ class RoundPolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, Game $game)
     {
-        //
+        return $game->locked_at === null
+            && (
+                $game->status == Game::STATUS_STARTED
+                || ( $game->status == Game::STATUS_WAITING_FIRST_ROUND && $game->user_id == $user->id )
+            );
     }
 
     /**
@@ -53,7 +58,17 @@ class RoundPolicy
      */
     public function update(User $user, Round $round)
     {
-        //
+        return $user->id == $round->author_id && $round->status === Round::STATUS_DRAFT;
+    }
+
+    /**
+     * @param User $user
+     * @param Round $round
+     * @return bool
+     */
+    public function publish(User $user, Round $round)
+    {
+        return $user->id == $round->author_id && $round->status == Round::STATUS_DRAFT;
     }
 
     /**

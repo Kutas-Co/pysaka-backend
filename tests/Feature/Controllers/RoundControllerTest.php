@@ -43,7 +43,7 @@ class RoundControllerTest extends TestCase
 
         $this->getJson(route('games.rounds.next', ['game' => $this->game]))
             ->assertSuccessful()
-            ->assertJsonStructure(RoundResource::jsonSchema())
+            ->assertJsonStructure(RoundResource::jsonSchema(['game']))
             ->assertJsonPath('status', Round::STATUS_DRAFT );
 
         $this->assertDatabaseHas('games', [
@@ -77,7 +77,7 @@ class RoundControllerTest extends TestCase
 
         $this->getJson(route('games.rounds.next', ['game' => $this->game]))
             ->assertSuccessful()
-            ->assertJsonStructure(RoundResource::jsonSchema())
+            ->assertJsonStructure(RoundResource::jsonSchema(['game']))
             ->assertJsonPath('id', $round->id)
             ->assertJsonPath('status', Round::STATUS_DRAFT );
 
@@ -109,7 +109,7 @@ class RoundControllerTest extends TestCase
 
         $this->putJson(route('rounds.update', $round), $roundData)
             ->assertSuccessful()
-            ->assertJsonStructure(RoundResource::jsonSchema());
+            ->assertJsonStructure(RoundResource::jsonSchema(['game']));
 
     }
 
@@ -132,7 +132,7 @@ class RoundControllerTest extends TestCase
 
         $this->postJson(route('rounds.publish', $round))
             ->assertSuccessful()
-            ->assertJsonStructure(RoundResource::jsonSchema());
+            ->assertJsonStructure(RoundResource::jsonSchema(['game']));
 
         $this->assertDatabaseHas('games', [
             'id' => $this->game->id,
@@ -159,6 +159,22 @@ class RoundControllerTest extends TestCase
         ]);
 
         $this->getJson(route('rounds.show', $round))
+            ->assertSuccessful()
+            ->assertJsonStructure(RoundResource::jsonSchema(['game']));
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_get_own_round_with_game_include()
+    {
+        $round = Round::factory()->create([
+            'game_id' => $this->game->id,
+            'author_id' => $this->user->id,
+            'status' => Round::STATUS_DRAFT,
+        ]);
+
+        $this->getJson(route('rounds.show', ['round' => $round, 'includes' => ['game']]))
             ->assertSuccessful()
             ->assertJsonStructure(RoundResource::jsonSchema());
     }

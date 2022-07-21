@@ -17,6 +17,7 @@ class RoundResource extends JsonResource
         'excerpt',
         'prev_round_id',
         'status',
+        'game',
     ];
 
     /**
@@ -31,6 +32,7 @@ class RoundResource extends JsonResource
             'id' => $this->id,
             'author_id' => $this->author_id,
             'game_id' => $this->game_id,
+            'game' => $this->whenLoaded('game', fn() => GameResource::make($this->game)),
             'text' => $this->text,
             'excerpt' => $this->excerpt,
             'prev_round_id' => $this->prev_round_id,

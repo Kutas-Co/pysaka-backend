@@ -93,7 +93,7 @@ class RoundController extends Controller
     {
         $this->authorize('view', $round);
 
-        return RoundResource::make($round);
+        return RoundResource::make($round->load(request()->input('includes', [])));
     }
 
     /**

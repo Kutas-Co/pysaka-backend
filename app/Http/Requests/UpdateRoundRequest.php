@@ -24,8 +24,8 @@ class UpdateRoundRequest extends FormRequest
     public function rules()
     {
         return [
-            'text' => ['required', 'string', 'max:65000'],
-            'excerpt' => ['required', 'string', 'max:1000'],
+            'text' => ['sometimes', 'string', 'max:65000'],
+            'excerpt' => ['sometimes', 'string', 'max:1000'],
         ];
     }
 }

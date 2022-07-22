@@ -40,6 +40,7 @@ class GameResource extends JsonResource
             'rounds' => $this->whenLoaded('rounds', fn() => RoundResource::collection($this->rounds)),
             'latest_round_excerpt' => $this->rounds()->latest()->first()?->excerpt,
             'max_lock_minutes' => $this->max_lock_minutes,
+            'is_playable_for_current_user' => $this->isPlayable,
             'locked_at' => $this->locked_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

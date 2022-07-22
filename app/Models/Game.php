@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $status
+ * @property-read bool $isPlayable
+ */
 class Game extends Model
 {
     use HasFactory;
@@ -35,6 +40,42 @@ class Game extends Model
                 $game->update(['name' => 'New Game #' . $user->games()->count() + 1]);
             }
         });
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPlayableAttribute()
+    {
+        /** @var User $user */
+        if( $user = auth()->user()){
+            //check game creator
+            $latestRound = $this->rounds()->latest()->first();
+
+            if ($user->id == $this->user_id){
+                return $this->status == Game::STATUS_DRAFT
+                    || $this->status == Game::STATUS_WAITING_FIRST_ROUND
+                    || ( $this->status == Game::STATUS_STARTED && $latestRound && $latestRound->author_id != $user->id && $latestRound->status == Round::STATUS_PUBLISHED);
+            } else {//check other users
+                return $this->status == Game::STATUS_CREATED
+                    && $this->locked_at == null
+                    && (
+                        $latestRound->status == Round::STATUS_PUBLISHED
+                        || ( $latestRound->status == Round::STATUS_DRAFT && $latestRound->creator_id == $user->id )
+                    );
+            }
+
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

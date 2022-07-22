@@ -24,6 +24,20 @@ class Game extends Model
     ];
 
     /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::created(function ($game) {
+            if($user = auth()->user()){
+                $game->update(['name' => 'New Game #' . $user->games()->count() + 1]);
+            }
+        });
+    }
+
+    /**
      * @return HasMany
      */
     public function rounds(): HasMany

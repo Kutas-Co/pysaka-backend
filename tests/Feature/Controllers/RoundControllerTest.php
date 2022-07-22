@@ -105,11 +105,17 @@ class RoundControllerTest extends TestCase
         $roundData = [
             'text' => $text,
             'excerpt' => substr($text, -50),
+            'excerpt_length' => strlen(substr($text, -50)),
         ];
 
         $this->putJson(route('rounds.update', $round), $roundData)
             ->assertSuccessful()
             ->assertJsonStructure(RoundResource::jsonSchema(['game']));
+
+        $this->assertDatabaseHas('rounds', [
+            'id' => $round->id,
+            'excerpt_length' => strlen(substr($text, -50)),
+        ]);
 
     }
 

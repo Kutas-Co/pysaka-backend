@@ -22,6 +22,7 @@ class Round extends Model
         'prev_round_id',
         'text',
         'excerpt',
+        'excerpt_length',
         'status',
     ];
 

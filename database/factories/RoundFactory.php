@@ -19,12 +19,14 @@ class RoundFactory extends Factory
      */
     public function definition()
     {
+
         return [
             'game_id' => Game::factory()->create()->id,
             'author_id' => User::factory()->create()->id,
             'prev_round_id' => null,
             'text' => $this->faker->text,
-            'excerpt' => $this->faker->sentence,
+            'excerpt' => $excerpt = $this->faker->sentence,
+            'excerpt_length' => strlen($excerpt),
             'status' => Round::STATUS_DRAFT,
         ];
     }

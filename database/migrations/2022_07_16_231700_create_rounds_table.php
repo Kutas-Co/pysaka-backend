@@ -21,7 +21,8 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'author_id');
             $table->foreignIdFor(Game::class);
             $table->text('text');
-            $table->string('excerpt', 1000);
+            $table->string('excerpt', 1000)->nullable();
+            $table->unsignedSmallInteger('excerpt_length')->default(0);
             $table->foreignIdFor(Round::class,'prev_round_id')->nullable();
             $table->string('status', 50)->default(Round::STATUS_DRAFT);
             $table->timestamps();

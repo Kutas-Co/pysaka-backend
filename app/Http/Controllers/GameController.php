@@ -19,7 +19,7 @@ class GameController extends Controller
      */
     public function index()
     {
-        $games = Game::whereIn('status', [Game::STATUS_STARTED, Game::STATUS_FINISHED])->latest()->paginate(15);
+        $games = Game::whereIn('status', [Game::STATUS_STARTED, Game::STATUS_FINISHED])->latest()->paginate(6);
         return GameResource::collection($games);
     }
 
@@ -29,7 +29,7 @@ class GameController extends Controller
      */
     public function indexUser(Request $request)
     {
-        return GameResource::collection($request->user()->games()->latest()->paginate(15));
+        return GameResource::collection($request->user()->games()->latest()->paginate(6));
     }
 
     /**

@@ -39,7 +39,7 @@ class Game extends Model
     {
         static::created(function ($game) {
             if($user = auth()->user()){
-                $game->update(['name' => 'New Game #' . $user->games()->count() + 1]);
+                $game->update(['name' => 'New Game #' . $user->games()->count()]);
             }
         });
     }

@@ -73,4 +73,27 @@ class GameTest extends TestCase
         $this->assertFalse($game->isPlayable);
 
     }
+
+    /**
+     * @test
+     */
+    public function game_is_payable_when_status_is_started()
+    {
+        $game = Game::factory()->create([
+            'status' => Game::STATUS_STARTED,
+        ]);
+        $creator = $game->user;
+        $round = Round::factory()->create([
+            'author_id' => $creator->id,
+            'game_id' => $game->id,
+            'status' => Round::STATUS_PUBLISHED,
+        ]);
+        $otherUser = User::factory()->create();
+        $this->actingAs($otherUser);
+
+        $this->assertEquals($game->user_id, $round->author_id);
+
+        $this->assertTrue($game->isPlayable);
+
+    }
 }

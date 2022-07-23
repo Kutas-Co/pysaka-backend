@@ -12,6 +12,7 @@ class RoundResource extends JsonResource
     const JSON_SCHEMA = [
         'id',
         'author_id',
+        'author',
         'game_id',
         'text',
         'excerpt',
@@ -32,6 +33,7 @@ class RoundResource extends JsonResource
         return [
             'id' => $this->id,
             'author_id' => $this->author_id,
+            'author' => $this->whenLoaded('author', fn() => $this->author),
             'game_id' => $this->game_id,
             'game' => $this->whenLoaded('game', fn() => GameResource::make($this->game)),
             'text' => $this->text,

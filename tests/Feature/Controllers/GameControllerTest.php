@@ -51,6 +51,26 @@ class GameControllerTest extends TestCase
     /**
      * @test
      */
+    public function user_can_get_public_games_list()
+    {
+        Game::factory()->count(2)->create(['user_id' => $this->user->id, 'status' => Game::STATUS_DRAFT]);
+        Game::factory()->create(['user_id' => $this->user->id, 'status' => Game::STATUS_STARTED]);
+        Game::factory()->count(2)->create(['status' => Game::STATUS_STARTED]);
+        Game::factory()->create(['status' => Game::STATUS_DRAFT]);
+        Game::factory()->create(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
+
+        $expectedPublicGamesCount = 1 + 2;
+
+        $response = $this->getJson(route('games.index'));
+        $response
+            ->assertSuccessful()
+            ->assertJsonStructure(['data' =>[ '*' =>  GameResource::jsonSchema(['rounds'])]]);
+        $this->assertCount($expectedPublicGamesCount, $response->json('data'));
+    }
+
+    /**
+     * @test
+     */
     public function user_can_get_game_by_id()
     {
         $game = Game::factory()->create(['user_id' => $this->user->id]);

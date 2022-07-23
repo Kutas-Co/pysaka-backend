@@ -21,7 +21,12 @@ class RoundController extends Controller
         //
     }
 
-    public function nextRound( Game $game)
+    /**
+     * @param Game $game
+     * @return RoundResource
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function nextRound(Game $game)
     {
         $this->authorize('getNext', [Round::class, $game]);
 
@@ -135,8 +140,15 @@ class RoundController extends Controller
         /** @var Game $game */
         if($game = $round->game){
             if ($game->status != Game::STATUS_STARTED && $request->user()->id == $game->user_id){
-                $game->start();
+                $game->start($withSave = false);
             }
+            $game->locked_at = null;
+
+            if ($game->rounds_max == $game->rounds()->count()){
+                $game->status = Game::STATUS_FINISHED;
+            }
+
+            $game->save();
         }
 
         return RoundResource::make($round);

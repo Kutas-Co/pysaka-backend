@@ -21,7 +21,7 @@ class GameFactory extends Factory
         return [
             'name' => 'New Game',
             'status' => Game::STATUS_DRAFT,
-            'rounds_max' => 1,
+            'rounds_max' => 3,
             'user_id' => User::factory(),
             'max_lock_minutes' => 15,
             'locked_at' => null,

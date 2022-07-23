@@ -15,11 +15,12 @@ class GameController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
-        //
+        $games = Game::whereIn('status', [Game::STATUS_STARTED, Game::STATUS_FINISHED])->latest()->paginate(15);
+        return GameResource::collection($games);
     }
 
     /**
@@ -64,7 +65,7 @@ class GameController extends Controller
     public function show(Request $request,Game $game)
     {
         $this->validate($request, [
-            'includes' => ['sometimes', 'array', Rule::in(['rounds'])]
+            'includes' => ['sometimes', 'array', Rule::in(['rounds', 'rounds.author'])]
         ]);
         return GameResource::make($game->load($request->input('includes', [] )));
     }

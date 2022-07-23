@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Round;
 use App\Traits\WithResourceSchema;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,7 +39,8 @@ class GameResource extends JsonResource
             'status' => $this->status,
             'rounds_max' => $this->rounds_max,
             'rounds' => $this->whenLoaded('rounds', fn() => RoundResource::collection($this->rounds)),
-            'latest_round_excerpt' => $this->rounds()->latest()->first()?->excerpt,
+            'finished_rounds_count' => $this->rounds()->whereStatus(Round::STATUS_PUBLISHED)->count(),
+            'latest_round_excerpt' => $this->rounds()->whereStatus(Round::STATUS_PUBLISHED)->latest()->first()?->excerpt,
             'max_lock_minutes' => $this->max_lock_minutes,
             'is_playable_for_current_user' => $this->isPlayable,
             'locked_at' => $this->locked_at,

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property string $status
  * @property-read bool $isPlayable
+ * @property string|null $locked_at
+ * @property integer $rounds_max
  */
 class Game extends Model
 {
@@ -25,7 +27,7 @@ class Game extends Model
      * @var string[]
      */
     protected $fillable = [
-        'status', 'user_id', 'name', 'rounds_max', 'max_lock_minutes',
+        'status', 'user_id', 'name', 'rounds_max', 'max_lock_minutes', 'locked_at',
     ];
 
     /**
@@ -57,11 +59,12 @@ class Game extends Model
                     || $this->status == Game::STATUS_WAITING_FIRST_ROUND
                     || ( $this->status == Game::STATUS_STARTED && $latestRound && $latestRound->author_id != $user->id && $latestRound->status == Round::STATUS_PUBLISHED);
             } else {//check other users
-                return $this->status == Game::STATUS_CREATED
-                    && $this->locked_at == null
+                return $this->status == Game::STATUS_STARTED
+//                    && is_null($this->locked_at)
                     && (
-                        $latestRound->status == Round::STATUS_PUBLISHED
-                        || ( $latestRound->status == Round::STATUS_DRAFT && $latestRound->creator_id == $user->id )
+                        $latestRound
+                        && ( $latestRound->status == Round::STATUS_PUBLISHED && $latestRound->author_id != $user->id )
+                        || ( $latestRound?->status == Round::STATUS_DRAFT && $latestRound->author_id == $user->id )
                     );
             }
 
@@ -89,9 +92,12 @@ class Game extends Model
     /**
      * @return void
      */
-    public function start()
+    public function start($withSave = true)
     {
-        $this->update(['status' => self::STATUS_STARTED]);
+        $this->status = self::STATUS_STARTED;
+        if ($withSave){
+            $this->save();
+        }
     }
 
     public function finish(): void

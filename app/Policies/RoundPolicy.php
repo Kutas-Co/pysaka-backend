@@ -56,11 +56,12 @@ class RoundPolicy
      */
     public function getNext(User $user, Game $game)
     {
-        return $game->locked_at === null
-            && (
-                $game->status == Game::STATUS_STARTED
-                || ( $game->user_id == $user->id && in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]) )
-            );
+        $latestRound = $game->rounds()->latest()->first();
+        return  ( $game->status == Game::STATUS_STARTED
+                && ( ( is_null($game->locked_at) && $latestRound?->author_id != $user->id )
+                    || ( !is_null($game->locked_at) && $latestRound?->author_id == $user->id)))
+                || ( $game->user_id == $user->id && in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]) );
+
     }
 
     /**

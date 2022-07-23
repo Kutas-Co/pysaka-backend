@@ -40,4 +40,12 @@ class Round extends Model
     {
         return $this->belongsTo(Game::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function author()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

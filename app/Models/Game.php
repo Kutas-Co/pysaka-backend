@@ -30,6 +30,10 @@ class Game extends Model
         'status', 'user_id', 'name', 'rounds_max', 'max_lock_minutes', 'locked_at',
     ];
 
+    protected $casts = [
+        'locked_at' => 'datetime'
+    ];
+
     /**
      * The "booted" method of the model.
      *
@@ -110,7 +114,7 @@ class Game extends Model
      */
     public function lockGame(): void
     {
-        $this->locked_at = now();
+        $this->locked_at = now()->startOfMinute();
         $this->save();
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Policies\RoundPolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,23 +56,7 @@ class Game extends Model
     {
         /** @var User $user */
         if( $user = auth()->user()){
-            //check game creator
-            $latestRound = $this->rounds()->latest()->first();
-
-            if ($user->id == $this->user_id){
-                return $this->status == Game::STATUS_DRAFT
-                    || $this->status == Game::STATUS_WAITING_FIRST_ROUND
-                    || ( $this->status == Game::STATUS_STARTED && $latestRound && $latestRound->author_id != $user->id && $latestRound->status == Round::STATUS_PUBLISHED);
-            } else {//check other users
-                return $this->status == Game::STATUS_STARTED
-//                    && is_null($this->locked_at)
-                    && (
-                        $latestRound
-                        && ( $latestRound->status == Round::STATUS_PUBLISHED && $latestRound->author_id != $user->id )
-                        || ( $latestRound?->status == Round::STATUS_DRAFT && $latestRound->author_id == $user->id )
-                    );
-            }
-
+            return (new RoundPolicy)->getNext($user, $this);
         } else {
             return false;
         }

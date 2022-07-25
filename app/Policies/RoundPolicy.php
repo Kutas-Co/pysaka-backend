@@ -57,10 +57,15 @@ class RoundPolicy
     public function getNext(User $user, Game $game)
     {
         $latestRound = $game->rounds()->latest()->first();
-        return  ( $game->status == Game::STATUS_STARTED
-                && ( ( is_null($game->locked_at) && $latestRound?->author_id != $user->id )
-                    || ( !is_null($game->locked_at) && $latestRound?->author_id == $user->id)))
-                || ( $game->user_id == $user->id && in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]) );
+        $gameIsStarted = $game->status == Game::STATUS_STARTED;
+        $notAuthorAndGameNotLocked = is_null($game->locked_at) && $latestRound?->author_id != $user->id;
+        $authorAndGameLocked = !is_null($game->locked_at) && $latestRound?->author_id == $user->id;
+        $isAuthor = $game->user_id == $user->id;
+        $gameIsDraftOrAwaitingFirstRound = in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]);
+
+        return ( $gameIsStarted && ( $notAuthorAndGameNotLocked || $authorAndGameLocked )  )
+            ||
+            ( $isAuthor &&  $gameIsDraftOrAwaitingFirstRound );
 
     }
 

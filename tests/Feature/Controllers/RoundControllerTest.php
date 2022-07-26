@@ -273,7 +273,7 @@ class RoundControllerTest extends TestCase
 
         $this->postJson(route('rounds.publish', $ownRound))
             ->assertSuccessful()
-            ->assertJsonStructure(RoundResource::jsonSchema(['game', 'author']));
+            ->assertJsonStructure(RoundResource::jsonSchema(['author']));
 
         $this->assertDatabaseHas('games', [
             'id' => $this->game->id,

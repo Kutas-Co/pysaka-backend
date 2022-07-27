@@ -3,7 +3,10 @@
 namespace Tests\Feature\Controllers;
 
 use App\Http\Resources\GameResource;
+use App\Http\Resources\PublicGameResource;
+use App\Http\Resources\PublicRoundResource;
 use App\Models\Game;
+use App\Models\Round;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -138,5 +141,50 @@ class GameControllerTest extends TestCase
             'id' => $game->id,
             'status' => Game::STATUS_FINISHED,
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function auth_user_can_get_public_game()
+    {
+        $round = Round::factory()->create(['status' => Round::STATUS_PUBLISHED]);
+        $game = $round->game;
+        $game->update(['status' => Game::STATUS_FINISHED]);
+        $expectedSchema = PublicGameResource::jsonSchema(['rounds']);
+        $expectedSchema['rounds'] = ['*' => PublicRoundResource::jsonSchema()];
+        $this->get(route('public.games.show', $game))
+            ->assertSuccessful()
+            ->assertJsonStructure($expectedSchema);
+    }
+
+    /**
+     * @test
+     */
+    public function guest_user_can_get_public_game()
+    {
+        auth()->logout();
+        $this->assertGuest();
+
+        $round = Round::factory()->create(['status' => Round::STATUS_PUBLISHED]);
+        $game = $round->game;
+        $game->update(['status' => Game::STATUS_FINISHED]);
+        $expectedSchema = PublicGameResource::jsonSchema(['rounds']);
+        $expectedSchema['rounds'] = ['*' => PublicRoundResource::jsonSchema()];
+        $this->get(route('public.games.show', $game))
+            ->assertSuccessful()
+            ->assertJsonStructure($expectedSchema);
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_get_public_game_only_if_game_is_finished()
+    {
+        $round = Round::factory()->create(['status' => Round::STATUS_PUBLISHED]);
+        $game = $round->game;
+        $game->update(['status' => Game::STATUS_STARTED]);
+        $this->get(route('public.games.show', $game))
+            ->assertNotFound();
     }
 }

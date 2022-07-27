@@ -6,8 +6,10 @@ use App\Http\Resources\RoundResource;
 use App\Models\Game;
 use App\Models\Round;
 use App\Models\User;
+use App\Notifications\GameFinishedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RoundControllerTest extends TestCase
@@ -293,6 +295,7 @@ class RoundControllerTest extends TestCase
      */
     public function game_is_finished_on_last_round_finish()
     {
+        Notification::fake();
         $otherUser = User::factory()->create();
         $this->game->forceFill([
             'status' => Game::STATUS_STARTED,
@@ -329,5 +332,53 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_FINISHED,
         ]);
 
+    }
+
+    /**
+     * @test
+     */
+    public function send_notification_to_involved_gamers_on_game_finish()
+    {
+        Notification::fake();
+
+        $otherUser = User::factory()->create();
+        $this->game->forceFill([
+            'status' => Game::STATUS_STARTED,
+            'user_id' => $otherUser->id,
+            'locked_at' => now(),
+            'rounds_max' => 2,
+        ]);
+        $this->game->save();
+        $round = Round::factory()->create([
+            'author_id' => $otherUser->id,
+            'status' => Round::STATUS_PUBLISHED,
+            'game_id' => $this->game->id,
+        ]);
+
+        $ownRound = Round::factory()->create([
+            'author_id' => $this->user->id,
+            'status' => Round::STATUS_DRAFT,
+            'game_id' => $this->game->id,
+        ]);
+
+        $this->assertDatabaseHas('games', [
+            'id' => $this->game->id,
+            'status' => Game::STATUS_STARTED,
+        ]);
+
+        $this->postJson(route('rounds.publish', $ownRound))
+            ->assertSuccessful()
+            ->assertJsonStructure(RoundResource::jsonSchema(['game', 'author']));
+
+        $this->assertDatabaseHas('games', [
+            'id' => $this->game->id,
+            'locked_at' => null,
+            'status' => Game::STATUS_FINISHED,
+        ]);
+
+        Notification::assertTimesSent(2, GameFinishedNotification::class);
+        Notification::assertSentTo([$this->user, $otherUser], GameFinishedNotification::class, function ($notification){
+            return $notification->game->id === $this->game->id;
+        });
     }
 }

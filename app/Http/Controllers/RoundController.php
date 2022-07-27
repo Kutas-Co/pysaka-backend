@@ -145,7 +145,7 @@ class RoundController extends Controller
             $game->locked_at = null;
 
             if ($game->rounds_max == $game->rounds()->count()){
-                $game->status = Game::STATUS_FINISHED;
+                $game->finish(false);
             }
 
             $game->save();

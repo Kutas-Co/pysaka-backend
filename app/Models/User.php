@@ -46,6 +46,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany
+     */
+    public function rounds()
+    {
+        return $this->hasMany(Round::class, 'author_id');
+    }
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>

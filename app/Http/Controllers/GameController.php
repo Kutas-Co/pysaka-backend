@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Http\Resources\GameResource;
+use App\Http\Resources\PublicGameResource;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -68,6 +69,20 @@ class GameController extends Controller
             'includes' => ['sometimes', 'array', Rule::in(['rounds', 'rounds.author'])]
         ]);
         return GameResource::make($game->load($request->input('includes', [] )));
+    }
+
+    /**
+     * @param Request $request
+     * @param Game $game
+     * @return PublicGameResource
+     */
+    public function showPublic( Game $game )
+    {
+        if ($game->status !== Game::STATUS_FINISHED){
+            abort(404);
+        }
+
+        return PublicGameResource::make($game);
     }
 
     /**

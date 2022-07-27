@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('access-tokens', [AuthController::class, 'create'])->name('access-tokens.create');
 Route::delete('access-tokens', [AuthController::class, 'destroy'])->name('access-tokens.destroy');
+Route::get('public/games/{game}', [GameController::class, 'showPublic'])->name('public.games.show');
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', function (Request $request) {
         return $request->user();

@@ -1,10 +1,10 @@
-@servers(['dev' => ['p_prod']])
+@servers(['prod' => ['wg_prod']])
 
-@task('deploy-dev', ['on' => 'dev'])
-cd /var/www/sandbox
+@task('deploy-prod', ['on' => 'prod'])
+cd /var/www/laravel
 php artisan down
 git pull
-composer install -o
+composer install --no-dev -o --prefer-dist
 php artisan migrate
 php artisan optimize:clear
 php artisan queue:restart

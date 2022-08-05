@@ -17,6 +17,14 @@ class UpdateRoundRequest extends FormRequest
     }
 
     /**
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge(['text' => $this->input('text') ?? ' ']);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
@@ -24,7 +32,7 @@ class UpdateRoundRequest extends FormRequest
     public function rules()
     {
         return [
-            'text' => ['required', 'string', 'max:65000'],
+            'text' => ['present', 'string', 'max:65000'],
             'excerpt' => ['present', 'nullable','string', 'max:1000'],
             'excerpt_length' => ['present', 'nullable', 'numeric', 'max:1000'],
         ];

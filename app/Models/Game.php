@@ -134,10 +134,12 @@ class Game extends Model
     /**
      * @return void
      */
-    public function lockGame(): void
+    public function lockGame($force = false): void
     {
-        $this->locked_at = now()->startOfMinute();
-        $this->save();
+        if (!$this->locked_at || ($this->locked_at && $force)){
+            $this->locked_at = now()->startOfMinute();
+            $this->save();
+        }
     }
 
 }

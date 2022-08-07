@@ -42,7 +42,7 @@ class GameController extends Controller
         return GameResource::make($request->user()->games()->firstOrCreate([
             'status' => Game::STATUS_DRAFT,
             'rounds_max' => 5,
-            'max_lock_minutes' => 15,
+            'max_lock_minutes' => 1,
         ]));
     }
 

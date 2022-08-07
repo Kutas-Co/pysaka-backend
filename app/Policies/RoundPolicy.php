@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\Round;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Http\Response;
 
 class RoundPolicy
 {
@@ -56,16 +57,16 @@ class RoundPolicy
      */
     public function getNext(User $user, Game $game)
     {
-        $latestRound = $game->rounds()->latest()->first();
+        $latestRound = $game->rounds()->whereStatus(Round::STATUS_PUBLISHED)->latest()->first();
+        $userIsAuthorOfLatestPublishedRound = $latestRound && $latestRound->author_id == $user->id;
         $gameIsStarted = $game->status == Game::STATUS_STARTED;
-        $notAuthorAndGameNotLocked = is_null($game->locked_at) && $latestRound?->author_id != $user->id;
-        $authorAndGameLocked = !is_null($game->locked_at) && $latestRound?->author_id == $user->id;
-        $isAuthor = $game->user_id == $user->id;
+        $gameLockedForCurrentUser = $game->locked_by_user_id === $user->id;
+        $gameIsOpenForNewRound = is_null( $game->locked_at );
+        $isGameCreator = $game->user_id == $user->id;
         $gameIsDraftOrAwaitingFirstRound = in_array($game->status, [Game::STATUS_DRAFT, Game::STATUS_WAITING_FIRST_ROUND]);
-
-        return ( $gameIsStarted && ( $notAuthorAndGameNotLocked || $authorAndGameLocked )  )
+        return ( $gameIsStarted && ( $gameLockedForCurrentUser || ( $gameIsOpenForNewRound && !$userIsAuthorOfLatestPublishedRound) ))
             ||
-            ( $isAuthor &&  $gameIsDraftOrAwaitingFirstRound );
+            ( $isGameCreator && $gameIsDraftOrAwaitingFirstRound );
 
     }
 
@@ -82,13 +83,21 @@ class RoundPolicy
     }
 
     /**
+     * Check user can publish own round for particular game
      * @param User $user
      * @param Round $round
      * @return bool
      */
     public function publish(User $user, Round $round)
     {
-        return $user->id == $round->author_id && $round->status == Round::STATUS_DRAFT;
+        /** @var Game $game */
+        $game = $round->game;
+        $gameLockedForCauser = $game->locked_by_user_id == $user->id;
+        $userIsGameOwner = $game->user_id == $user->id;
+        $userIsAuthorOfRound = $user->id == $round->author_id;
+        $roundIsInDraftStatus = $round->status == Round::STATUS_DRAFT;
+
+        return ( $userIsAuthorOfRound && $roundIsInDraftStatus && $userIsGameOwner) || $gameLockedForCauser ;
     }
 
     /**

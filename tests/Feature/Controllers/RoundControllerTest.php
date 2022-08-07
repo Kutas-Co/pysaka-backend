@@ -76,6 +76,7 @@ class RoundControllerTest extends TestCase
             'id' => $this->game->id,
             'status' => Game::STATUS_WAITING_FIRST_ROUND,
             'locked_at' => null,
+            'locked_by_user_id' => null,
         ]);
 
         $this->getJson(route('games.rounds.next', ['game' => $this->game]))
@@ -127,7 +128,11 @@ class RoundControllerTest extends TestCase
      */
     public function user_can_publish_first_round_for_own_game()
     {
-        $this->game->update(['status' => Game::STATUS_DRAFT]);
+        $this->game->update([
+            'status' => Game::STATUS_DRAFT,
+            'locked_at' => null,
+            'locked_by_user_id' => null,
+        ]);
         $round = Round::factory()->create([
             'game_id' => $this->game->id,
             'author_id' => $this->user->id,
@@ -137,6 +142,8 @@ class RoundControllerTest extends TestCase
         $this->assertDatabaseHas('games', [
             'id' => $this->game->id,
             'status' => Game::STATUS_DRAFT,
+            'locked_at' => null,
+            'locked_by_user_id' => null,
         ]);
 
         $this->postJson(route('rounds.publish', $round))
@@ -229,12 +236,13 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_STARTED,
             'user_id' => $otherUser->id,
             'locked_at' => now(),
+            'locked_by_user_id' => $this->user->id,
         ]);
         $round = Round::factory()->create([
             'author_id' => $otherUser->id,
             'status' => Round::STATUS_PUBLISHED,
             'game_id' => $this->game->id,
-            'created_at' => now()->subMinutes(1)
+            'created_at' => now()->subMinute()
         ]);
         $ownRound = Round::factory()->create([
             'author_id' => $this->user->id,
@@ -260,6 +268,7 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_STARTED,
             'user_id' => $otherUser->id,
             'locked_at' => now(),
+            'locked_by_user_id' => $this->user->id,
         ]);
         $round = Round::factory()->create([
             'author_id' => $otherUser->id,
@@ -293,6 +302,36 @@ class RoundControllerTest extends TestCase
     /**
      * @test
      */
+    public function user_cant_publish_round_for_not_own_game_if_lock_expired()
+    {
+        $otherUser = User::factory()->create();
+        $this->game->update([
+            'status' => Game::STATUS_STARTED,
+            'user_id' => $otherUser->id,
+            'locked_at' => null,
+            'locked_by_user_id' => null,
+        ]);
+
+        $round = Round::factory()->create([
+            'author_id' => $otherUser->id,
+            'status' => Round::STATUS_PUBLISHED,
+            'game_id' => $this->game->id,
+        ]);
+
+        $ownRound = Round::factory()->create([
+            'author_id' => $this->user->id,
+            'status' => Round::STATUS_DRAFT,
+            'game_id' => $this->game->id,
+        ]);
+
+        $this->postJson(route('rounds.publish', $ownRound))
+            ->assertForbidden();
+
+    }
+
+    /**
+     * @test
+     */
     public function game_is_finished_on_last_round_finish()
     {
         Notification::fake();
@@ -301,6 +340,7 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_STARTED,
             'user_id' => $otherUser->id,
             'locked_at' => now(),
+            'locked_by_user_id' => $this->user->id,
             'rounds_max' => 2,
         ]);
         $this->game->save();
@@ -346,6 +386,7 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_STARTED,
             'user_id' => $otherUser->id,
             'locked_at' => now(),
+            'locked_by_user_id' => $this->user->id,
             'rounds_max' => 2,
         ]);
         $this->game->save();

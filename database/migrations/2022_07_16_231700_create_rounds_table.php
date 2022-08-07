@@ -19,7 +19,7 @@ return new class extends Migration
         Schema::create('rounds', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'author_id');
-            $table->foreignIdFor(Game::class);
+            $table->foreignIdFor(Game::class)->nullable();
             $table->text('text');
             $table->string('excerpt', 1000)->nullable();
             $table->unsignedSmallInteger('excerpt_length')->default(0);

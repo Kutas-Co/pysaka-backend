@@ -34,6 +34,41 @@ class GameTest extends TestCase
         $game = Game::factory()->create();
         $this->assertInstanceOf(User::class, $game->user);
     }
+
+    /**
+     * @test
+     */
+    public function game_can_belongs_to_locker_user()
+    {
+        $otherUser = User::factory()->create();
+
+        $game = Game::factory()->create([
+            'locked_by_user_id' => $otherUser->id
+        ]);
+
+        $this->assertInstanceOf(User::class, $game->lockedByUser);
+        $this->assertTrue($game->lockedByUser->is($otherUser));
+    }
+
+    /**
+     * @test
+     */
+    public function set_locked_by_user_id_attribute_on_game_locking()
+    {
+        $lockerUser = User::factory()->create();
+
+        $game = Game::factory()->create();
+
+        $this->assertNull($game->locked_at);
+        $this->assertNull($game->locked_by_user_id);
+
+        $game->lockGame($lockerUser);
+
+        $game->fresh();
+        $this->assertNotNull($game->locked_at);
+        $this->assertEquals($lockerUser->id, $game->locked_by_user_id);
+    }
+
     /**
      * @test
      */

@@ -44,6 +44,7 @@ class GameResource extends JsonResource
             'max_lock_minutes' => $this->max_lock_minutes,
             'is_playable_for_current_user' => $this->isPlayable,
             'locked_at' => $this->locked_at,
+            'locked_by_user_id' => $this->locked_by_user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\GameFinished;
 use App\Policies\RoundPolicy;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read bool $isPlayable
  * @property-read string $frontendUrl
  * @property string|null $locked_at
+ * @property integer|null $locked_by_user_id
+ * @property-read User | null $lockedByUser
  * @property integer $rounds_max
  */
 class Game extends Model
@@ -47,7 +50,7 @@ class Game extends Model
      * @var string[]
      */
     protected $fillable = [
-        'status', 'user_id', 'name', 'rounds_max', 'max_lock_minutes', 'locked_at',
+        'status', 'user_id', 'name', 'rounds_max', 'max_lock_minutes', 'locked_at', 'locked_by_user_id',
     ];
 
     protected $casts = [
@@ -87,6 +90,14 @@ class Game extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function lockedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'locked_by_user_id');
     }
 
     /**
@@ -132,12 +143,15 @@ class Game extends Model
     }
 
     /**
+     * @param User|Authenticatable $locker
+     * @param bool $force
      * @return void
      */
-    public function lockGame($force = false): void
+    public function lockGame(User|Authenticatable $locker, $force = false): void
     {
         if (!$this->locked_at || ($this->locked_at && $force)){
             $this->locked_at = now()->startOfMinute();
+            $this->locked_by_user_id = $locker->id;
             $this->save();
         }
     }

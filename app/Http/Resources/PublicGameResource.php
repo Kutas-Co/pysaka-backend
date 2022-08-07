@@ -30,7 +30,7 @@ class PublicGameResource extends JsonResource
             'author_name' => $this->user->name,
             'name' => $this->name,
             'status' => $this->status,
-            'rounds' => PublicRoundResource::collection($this->rounds),
+            'rounds' => PublicRoundResource::collection($this->rounds()->whereStatus(Round::STATUS_PUBLISHED)->get()),
         ];
     }
 }

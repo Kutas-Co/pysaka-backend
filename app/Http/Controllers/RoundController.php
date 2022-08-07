@@ -31,7 +31,7 @@ class RoundController extends Controller
         $this->authorize('getNext', [Round::class, $game]);
 
         if ( $game->status == Game::STATUS_STARTED ){
-            $game->lockGame();
+            $game->lockGame(auth()->user());
         }
         if ( $game->status == Game::STATUS_DRAFT ){
             $game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
@@ -57,7 +57,7 @@ class RoundController extends Controller
         $this->authorize('create', [Round::class, $game]);
 
         if ($game->status != Game::STATUS_DRAFT){
-            $game->lockGame();
+            $game->lockGame( $request->user() );
         }
         if ($game->status == Game::STATUS_DRAFT){
             $game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
@@ -143,6 +143,7 @@ class RoundController extends Controller
                 $game->start($withSave = false);
             }
             $game->locked_at = null;
+            $game->locked_by_user_id = null;
 
             if ($game->rounds_max == $game->rounds()->count()){
                 $game->finish(false);

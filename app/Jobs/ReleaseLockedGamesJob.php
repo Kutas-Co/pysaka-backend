@@ -35,6 +35,7 @@ class ReleaseLockedGamesJob implements ShouldQueue
             ->where('locked_at', '<=', now()->subMinutes(15)
             ->toDateTimeString())->update([
                 'locked_at' => null,
+                'locked_by_user_id' => null,
             ]);
     }
 }

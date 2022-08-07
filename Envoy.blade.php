@@ -5,7 +5,7 @@ cd /var/www/laravel
 php artisan down
 git pull
 composer install --no-dev -o --prefer-dist
-php artisan migrate
+php artisan migrate --force
 php artisan optimize:clear
 php artisan queue:restart
 php artisan up

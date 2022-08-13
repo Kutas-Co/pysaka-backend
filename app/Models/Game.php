@@ -24,6 +24,9 @@ class Game extends Model
 {
     use HasFactory;
 
+    /**
+     * Statuses
+     */
     const STATUS_DRAFT = 'Draft';
     const STATUS_CREATED = 'Created';
     const STATUS_STARTED = 'Started';

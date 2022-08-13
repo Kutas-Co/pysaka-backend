@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Events\GameFinished;
 use App\Policies\RoundPolicy;
+use Database\Factories\GameFactory;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * App\Models\Game
+ *
  * @property string $status
  * @property-read bool $isPlayable
  * @property-read string $frontendUrl
@@ -19,6 +23,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property integer|null $locked_by_user_id
  * @property-read User | null $lockedByUser
  * @property integer $rounds_max
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property int|null $max_lock_minutes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $frontend_url
+ * @property-read Collection $involved_users
+ * @property-read bool $is_playable
+ * @property-read Collection|\App\Models\Round[] $rounds
+ * @property-read int|null $rounds_count
+ * @property-read \App\Models\User|null $user
+ * @method static GameFactory factory(...$parameters)
+ * @method static Builder|Game newModelQuery()
+ * @method static Builder|Game newQuery()
+ * @method static Builder|Game query()
+ * @method static Builder|Game whereCreatedAt($value)
+ * @method static Builder|Game whereId($value)
+ * @method static Builder|Game whereLockedAt($value)
+ * @method static Builder|Game whereLockedByUserId($value)
+ * @method static Builder|Game whereMaxLockMinutes($value)
+ * @method static Builder|Game whereName($value)
+ * @method static Builder|Game whereRoundsMax($value)
+ * @method static Builder|Game whereStatus($value)
+ * @method static Builder|Game whereUpdatedAt($value)
+ * @method static Builder|Game whereUserId($value)
+ * @mixin \Eloquent
  */
 class Game extends Model
 {

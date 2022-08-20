@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateRoundRequest;
 use App\Http\Resources\RoundResource;
 use App\Models\Game;
 use App\Models\Round;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 
 class RoundController extends Controller
@@ -24,7 +25,7 @@ class RoundController extends Controller
     /**
      * @param Game $game
      * @return RoundResource
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function nextRound(Game $game)
     {
@@ -129,9 +130,9 @@ class RoundController extends Controller
      * @param Request $request
      * @param Round $round
      * @return RoundResource
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
-    public function publish(Request $request, Round $round)
+    public function publish(Request $request, Round $round): RoundResource
     {
         $this->authorize('publish', $round);
 
@@ -145,7 +146,7 @@ class RoundController extends Controller
             $game->locked_at = null;
             $game->locked_by_user_id = null;
 
-            if ($game->rounds_max == $game->rounds()->count()){
+            if ($game->rounds_max <= $game->rounds()->count()){
                 $game->finish(false);
             }
 

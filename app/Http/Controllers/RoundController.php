@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\GameFinished;
-use App\Events\GameUpdated;
 use App\Http\Requests\StoreRoundRequest;
 use App\Http\Requests\UpdateRoundRequest;
 use App\Http\Resources\RoundResource;
@@ -33,13 +32,6 @@ class RoundController extends Controller
     {
         $this->authorize('getNext', [Round::class, $game]);
 
-        if ( $game->status == Game::STATUS_STARTED ){
-            $game->lockGame(auth()->user());
-        }
-        if ( $game->status == Game::STATUS_DRAFT ){
-            $game->update(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
-        }
-
         $newRound = Round::query()->firstOrCreate([
             'game_id' => $game->id,
             'status' => Round::STATUS_DRAFT,
@@ -49,7 +41,13 @@ class RoundController extends Controller
             'excerpt' => '',
         ]);
 
-        broadcast(new GameUpdated($game))->toOthers();
+        if ( $game->status == Game::STATUS_STARTED ){
+            $game->lockGame(auth()->user(), $force = false, $withSave = false);
+        }
+        if ( $game->status == Game::STATUS_DRAFT ){
+            $game->fill(['status' => Game::STATUS_WAITING_FIRST_ROUND]);
+        }
+        $game->save();
 
         return RoundResource::make($newRound);
     }

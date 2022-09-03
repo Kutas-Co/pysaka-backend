@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GameFinished;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Http\Resources\GameResource;
@@ -121,6 +122,7 @@ class GameController extends Controller
     {
         $this->authorize('finish', $game);
         $game->finish();
+        GameFinished::dispatch($game);
         return GameResource::make($game);
     }
 

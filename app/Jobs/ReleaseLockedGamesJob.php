@@ -33,7 +33,7 @@ class ReleaseLockedGamesJob implements ShouldQueue
     public function handle()
     {
         $gameIdsToRelease = Game::query()
-            ->where('locked_at', '<=', now()->subMinutes(15)
+            ->where('locked_at', '<=', now()->subMinutes(1)
             ->toDateTimeString())->pluck('id')->toArray();
         if (!empty($gameIdsToRelease)){
             broadcast(new GamesUnlocked($gameIdsToRelease));

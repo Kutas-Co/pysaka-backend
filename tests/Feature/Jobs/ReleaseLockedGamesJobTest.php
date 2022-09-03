@@ -6,6 +6,7 @@ use App\Jobs\ReleaseLockedGamesJob;
 use App\Models\Game;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class ReleaseLockedGamesJobTest extends TestCase
@@ -17,6 +18,7 @@ class ReleaseLockedGamesJobTest extends TestCase
      */
     public function system_can_release_locked_games()
     {
+        Event::fake();
         $gameMustBeReleased = Game::factory()->create([
             'locked_at' => now()->subMinutes(16)
         ]);

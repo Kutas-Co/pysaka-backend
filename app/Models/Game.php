@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\GameFinished;
-use App\Events\GameLocked;
+use App\Events\GameUpdated;
 use App\Policies\RoundPolicy;
 use Database\Factories\GameFactory;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -89,6 +88,17 @@ class Game extends Model
                 $game->update(['name' => 'New Game #' . $user->games()->count()]);
             }
         });
+        static::updated(function ($game) {
+            if (in_array($game->status, [
+                Game::STATUS_STARTED, Game::STATUS_FINISHED
+            ])){
+                if (auth()->check()){
+                    broadcast(new GameUpdated($game))->toOthers();
+                } else {
+                    broadcast(new GameUpdated($game));
+                }
+            }
+        });
     }
 
     /**
@@ -165,14 +175,17 @@ class Game extends Model
     /**
      * @param User|Authenticatable $locker
      * @param bool $force
+     * @param bool $withSave
      * @return void
      */
-    public function lockGame(User|Authenticatable $locker, $force = false): void
+    public function lockGame(User|Authenticatable $locker, bool $force = false, $withSave = true): void
     {
         if (!$this->locked_at || ($this->locked_at && $force)){
             $this->locked_at = now()->startOfMinute();
             $this->locked_by_user_id = $locker->id;
-            $this->save();
+            if ($withSave){
+                $this->save();
+            }
         }
     }
 

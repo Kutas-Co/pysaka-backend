@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\GamesUnlocked;
 use App\Models\Game;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -31,11 +32,15 @@ class ReleaseLockedGamesJob implements ShouldQueue
      */
     public function handle()
     {
-        Game::query()
+        $gameIdsToRelease = Game::query()
             ->where('locked_at', '<=', now()->subMinutes(15)
-            ->toDateTimeString())->update([
+            ->toDateTimeString())->pluck('id')->toArray();
+        if (!empty($gameIdsToRelease)){
+            broadcast(new GamesUnlocked($gameIdsToRelease));
+            Game::query()->whereIn('id', $gameIdsToRelease)->update([
                 'locked_at' => null,
                 'locked_by_user_id' => null,
             ]);
+        }
     }
 }

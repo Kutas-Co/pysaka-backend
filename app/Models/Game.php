@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\GameFinished;
+use App\Events\GameLocked;
 use App\Policies\RoundPolicy;
 use Database\Factories\GameFactory;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Game
@@ -21,20 +23,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read string $frontendUrl
  * @property string|null $locked_at
  * @property integer|null $locked_by_user_id
- * @property-read User | null $lockedByUser
  * @property integer $rounds_max
  * @property int $id
  * @property int $user_id
  * @property string $name
  * @property int|null $max_lock_minutes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read mixed $frontend_url
  * @property-read Collection $involved_users
  * @property-read bool $is_playable
  * @property-read Collection|\App\Models\Round[] $rounds
  * @property-read int|null $rounds_count
- * @property-read \App\Models\User|null $user
+ * @property-read User|null $user
  * @method static GameFactory factory(...$parameters)
  * @method static Builder|Game newModelQuery()
  * @method static Builder|Game newQuery()
@@ -50,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder|Game whereUpdatedAt($value)
  * @method static Builder|Game whereUserId($value)
  * @mixin \Eloquent
+ * @property-read User|null $lockedByUser
  */
 class Game extends Model
 {
@@ -63,22 +65,6 @@ class Game extends Model
     const STATUS_STARTED = 'Started';
     const STATUS_WAITING_FIRST_ROUND = 'Waiting first round';
     const STATUS_FINISHED = 'Finished';
-
-
-    /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-        static::updated(function ($game) {
-            if (self::STATUS_FINISHED === $game->status){
-                GameFinished::dispatch($game);
-            }
-        });
-    }
 
     /**
      * @var string[]

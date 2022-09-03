@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoundController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::post('access-tokens', [AuthController::class, 'create'])->name('access-tokens.create');
 Route::delete('access-tokens', [AuthController::class, 'destroy'])->name('access-tokens.destroy');
 Route::get('public/games/{game}', [GameController::class, 'showPublic'])->name('public.games.show');

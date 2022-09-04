@@ -1,4 +1,4 @@
-@servers(['prod' => ['wg_prod']])
+@servers(['prod' => ['pysaka_prod']])
 
 @task('deploy-prod', ['on' => 'prod'])
 cd /var/www/laravel

@@ -16,7 +16,7 @@ class RegisteredUserController extends Controller
      * Handle an incoming registration request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -36,8 +36,11 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+//        Auth::login($user);
 
-        return response()->noContent();
+        return response()->json([
+            'access_token' => $user->createToken('access_token')->plainTextToken,
+            'type' => 'Bearer',
+        ]);
     }
 }

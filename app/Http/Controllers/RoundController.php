@@ -11,6 +11,9 @@ use App\Models\Round;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 
+/**
+ * @group Rounds
+ */
 class RoundController extends Controller
 {
     /**
@@ -94,7 +97,17 @@ class RoundController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified round.
+     * @response {
+    "id": 168,
+    "author_id": 3,
+    "game_id": 106,
+    "text": "test test",
+    "excerpt": "test",
+    "excerpt_length": 4,
+    "prev_round_id": null,
+    "status": "Published"
+    }
      *
      * @param  \App\Models\Round  $round
      * @return RoundResource

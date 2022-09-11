@@ -12,11 +12,30 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 
+/**
+ * @group Games
+ */
 class GameController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the public games.
      *
+     * @response { "data": [ {
+        "id": 132,
+        "user_id": 1,
+        "name": "New Game #6",
+        "status": "Finished",
+        "rounds_max": 2,
+        "finished_rounds_count": 2,
+        "latest_round_excerpt": null,
+        "max_lock_minutes": 15,
+        "is_playable_for_current_user": false,
+        "locked_at": null,
+        "locked_by_user_id": null,
+        "created_at": "2022-09-03T21:09:31.000000Z",
+        "updated_at": "2022-09-03T21:09:53.000000Z"
+        },]
+     * }
      * @return AnonymousResourceCollection
      */
     public function index()
@@ -26,6 +45,24 @@ class GameController extends Controller
     }
 
     /**
+     * Display a listing of the auth user's games.
+     * @response { "data": [{
+        "id": 132,
+        "user_id": 1,
+        "name": "New Game #6",
+        "status": "Finished",
+        "rounds_max": 2,
+        "finished_rounds_count": 2,
+        "latest_round_excerpt": null,
+        "max_lock_minutes": 15,
+        "is_playable_for_current_user": false,
+        "locked_at": null,
+        "locked_by_user_id": null,
+        "created_at": "2022-09-03T21:09:31.000000Z",
+        "updated_at": "2022-09-03T21:09:53.000000Z"
+        },]
+     * }
+     *
      * @param Request $request
      * @return AnonymousResourceCollection
      */

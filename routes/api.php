@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoundController;
 use Illuminate\Http\Request;
@@ -22,9 +23,7 @@ Route::post('access-tokens', [AuthController::class, 'create'])->name('access-to
 Route::delete('access-tokens', [AuthController::class, 'destroy'])->name('access-tokens.destroy');
 Route::get('public/games/{game}', [GameController::class, 'showPublic'])->name('public.games.show');
 Route::middleware(['auth:sanctum'])->group(function (){
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/user', UserController::class)->name('user');
 
     Route::resource('games', GameController::class)->only('create', 'update', 'show', 'index');
     Route::get('user/games', [GameController::class, 'indexUser'])->name('games.user.index');

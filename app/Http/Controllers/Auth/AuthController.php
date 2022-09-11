@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Auth\LoginRequest;
 
+/**
+ * @group Auth
+ */
 class AuthController extends Controller
 {
     public function __construct()
@@ -15,8 +18,12 @@ class AuthController extends Controller
     }
 
     /**
+     * Create auth token for user
+     *
+     * @response { "access_token": "token-string", "type": "Bearer" }
      * @param LoginRequest $request
      * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function create(LoginRequest $request): JsonResponse
     {

@@ -103,7 +103,7 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-*   You must have node & npm installed. You may [download it here](https://nodejs.org/uk/download/)
+*   You must have Laravel requirements installed. You may check them [here](https://laravel.com/docs/9.x/deployment#server-requirements)
 
 ### Installation
 

@@ -27,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //force tsl usage for non local development
+        if(config('app.env') !== 'local') {
+            \URL::forceScheme('https');
+        }
+
         VerifyEmail::createUrlUsing(function ($notifiable){
 
             $id = $notifiable->getKey();

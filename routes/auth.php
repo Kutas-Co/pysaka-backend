@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SocialiteAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,9 @@ Route::prefix('api')->group(function (){
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->middleware('auth')
         ->name('logout');
+
+    /* Socialite */
+    Route::get('auth/redirect', [SocialiteAuthController::class, 'redirect'])->name('socialite.redirect');
+    Route::get('auth/callback', [SocialiteAuthController::class, 'callback'])->name('socialite.callback');
 });
 

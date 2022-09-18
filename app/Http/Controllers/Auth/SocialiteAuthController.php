@@ -43,6 +43,7 @@ class SocialiteAuthController extends Controller
         try {
             $socialiteUser = Socialite::driver($request->driver)->stateless()->user();
 
+            //find existed or create new user
             $user = User::query()->firstOrCreate([
                 'email' => $socialiteUser->email,
             ], [
@@ -51,8 +52,14 @@ class SocialiteAuthController extends Controller
                 'email_verified_at' => now(),
             ]);
 
+            //fire event if user created
             if ($user->wasRecentlyCreated){
                 event(new Registered($user));
+            }
+
+            //mark email as verified if required
+            if (!$user->hasVerifiedEmail()){
+                $user->markEmailAsVerified();
             }
 
             return response()->json([

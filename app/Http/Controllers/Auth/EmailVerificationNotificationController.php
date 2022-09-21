@@ -14,8 +14,7 @@ class EmailVerificationNotificationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json(['has_verified' => true, 'success' => false]);
         }

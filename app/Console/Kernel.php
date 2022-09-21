@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->job(ReleaseLockedGamesJob::class)->everyMinute();
+        $schedule->command('sanctum:prune-expired')->daily();
     }
 
     /**

@@ -27,16 +27,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //force tsl usage for non local development
+        if(config('app.env') !== 'local') {
+            \URL::forceScheme('https');
+        }
+
         VerifyEmail::createUrlUsing(function ($notifiable){
 
             $id = $notifiable->getKey();
             $hash = sha1($notifiable->getEmailForVerification());
 
-            parse_str(parse_url(URL::temporarySignedRoute(
+            $url = URL::temporarySignedRoute(
                 'verification.verify',
                 Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
-                compact('id', 'hash')
-            ), PHP_URL_QUERY), $query);
+                compact('id', 'hash'),false
+            );
+
+            parse_str(parse_url($url, PHP_URL_QUERY), $query);
 
             return sprintf(
                 '%s/verify-email?id=%s&hash=%s&expires=%s&signature=%s',

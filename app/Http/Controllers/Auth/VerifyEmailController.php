@@ -17,6 +17,8 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request)
     {
+        abort_if(!$request->hasValidSignature(false), 403, 'Action is forbidden');
+
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json([
                 'has_verified' => true,

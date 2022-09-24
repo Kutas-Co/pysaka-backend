@@ -7,11 +7,15 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Auth
+ */
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Handle an incoming authentication request.
-     *
+     * @response 204 {}
+     * @unauthenticated
      * @param  \App\Http\Requests\Auth\LoginRequest  $request
      * @return \Illuminate\Http\Response
      */

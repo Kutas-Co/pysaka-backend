@@ -21,6 +21,7 @@ class AuthController extends Controller
      * Create auth token for user
      *
      * @response { "access_token": "token-string", "type": "Bearer" }
+     * @unauthenticated
      * @param LoginRequest $request
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoundController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::post('access-tokens', [AuthController::class, 'create'])->name('access-tokens.create');
 Route::delete('access-tokens', [AuthController::class, 'destroy'])->name('access-tokens.destroy');
 Route::get('public/games/{game}', [GameController::class, 'showPublic'])->name('public.games.show');
+Route::get('statistic', StatisticController::class)->name('statistic');
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', UserController::class)->name('user');
 

@@ -417,7 +417,7 @@ class RoundControllerTest extends TestCase
             'status' => Game::STATUS_FINISHED,
         ]);
 
-        Notification::assertTimesSent(2, GameFinishedNotification::class);
+        Notification::assertSentTimes(GameFinishedNotification::class, 2 );
         Notification::assertSentTo([$this->user, $otherUser], GameFinishedNotification::class, function ($notification){
             return $notification->game->id === $this->game->id;
         });
